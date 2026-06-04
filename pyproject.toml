@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "production-readiness-scorecard"
+version = "0.1.0"
+description = "CLI for evaluating production readiness of a service from YAML metadata."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.8,<3",
+  "PyYAML>=6,<7",
+  "typer>=0.12,<1",
+  "rich>=13,<14",
+  "Jinja2>=3,<4",
+]
+
+[project.scripts]
+production-readiness-scorecard = "production_readiness_scorecard.cli:app"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["production_readiness_scorecard*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

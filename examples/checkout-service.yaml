@@ -1,0 +1,66 @@
+service:
+  name: checkout-service
+  owner: checkout-team
+  tier: critical
+  lifecycle: pre-production
+  language: java
+  repository: https://github.com/example/checkout-service
+
+ownership:
+  slack_channel: "#checkout-alerts"
+  on_call_rotation: checkout-primary
+  business_owner: commerce-platform
+  escalation_policy: checkout-escalation
+
+operations:
+  runbook: docs/runbook.md
+  dashboard: https://grafana.example.com/checkout
+  rollback_plan: docs/rollback.md
+  rollback_tested: false
+  deployment_strategy: canary
+  known_failure_modes: docs/failure-modes.md
+
+slo:
+  availability_target: 99.95
+  latency_p95_ms: 300
+  error_rate_percent: 0.5
+
+observability:
+  health_endpoint: /health
+  readiness_endpoint: ""
+  dashboard: https://grafana.example.com/checkout
+  metrics_enabled: false
+  tracing_enabled: true
+  logs_structured: true
+
+alerts:
+  high_error_rate: false
+  high_latency: false
+  dependency_failure: false
+  saturation: false
+  routed_to_on_call: true
+
+dependencies:
+  services:
+    - payment-service
+    - order-service
+  databases:
+    - checkout-db
+  external:
+    - tax-api
+  timeout_strategy: docs/timeouts.md
+  retry_strategy: docs/retries.md
+
+security:
+  authentication_required: true
+  authorization_model: role-based
+  data_classification: confidential
+  secrets_managed: true
+  pii_access: true
+  retention_policy: ""
+
+api:
+  openapi_spec: docs/openapi.yaml
+  versioning_strategy: uri-versioning
+  backward_compatibility_notes: docs/compatibility.md
+  deprecation_policy: ""

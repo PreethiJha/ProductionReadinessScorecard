@@ -1,0 +1,35 @@
+name: Production Readiness Check
+
+on:
+  pull_request:
+    paths:
+      - "examples/**"
+      - "production_readiness_scorecard/**"
+
+jobs:
+  readiness-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Run tests
+        run: pytest
+
+      - name: Run production readiness scorecard
+        run: |
+          production-readiness-scorecard evaluate \
+            --service examples/checkout-service.yaml \
+            --rules examples/rules.yaml \
+            --output reports/checkout-readiness.md \
+            --json-output reports/checkout-readiness.json \
+            --fail-below 80
+

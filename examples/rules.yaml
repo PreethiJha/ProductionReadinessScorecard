@@ -1,0 +1,345 @@
+scorecard:
+  passing_score: 80
+  categories:
+    ownership:
+      weight: 15
+    operations:
+      weight: 15
+    slo:
+      weight: 15
+    observability:
+      weight: 15
+    alerts:
+      weight: 15
+    dependencies:
+      weight: 10
+    security:
+      weight: 10
+    api:
+      weight: 5
+
+rules:
+  - id: ownership.owner_required
+    category: ownership
+    description: Service owner must be defined.
+    field: service.owner
+    required_for_tiers: [critical, high, medium, low]
+    severity: critical
+    recommendation: Add the owning team under service.owner.
+    blocking: true
+
+  - id: ownership.slack_channel_required
+    category: ownership
+    description: Slack channel should be defined.
+    field: ownership.slack_channel
+    required_for_tiers: [critical, high, medium]
+    severity: high
+    recommendation: Add a Slack channel for team communication and incidents.
+
+  - id: ownership.on_call_required
+    category: ownership
+    description: On-call rotation must be defined for critical and high-tier services.
+    field: ownership.on_call_rotation
+    required_for_tiers: [critical, high]
+    severity: high
+    recommendation: Add the on-call rotation responsible for this service.
+    blocking: true
+
+  - id: ownership.business_owner_required
+    category: ownership
+    description: Business owner should be documented.
+    field: ownership.business_owner
+    required_for_tiers: [critical, high, medium, low]
+    severity: low
+    recommendation: Add a business owner for launch accountability.
+
+  - id: ownership.escalation_policy_required
+    category: ownership
+    description: Escalation policy should be documented.
+    field: ownership.escalation_policy
+    required_for_tiers: [critical, high, medium]
+    severity: low
+    recommendation: Add an escalation policy with response expectations.
+
+  - id: operations.runbook_required
+    category: operations
+    description: Runbook must be provided.
+    field: operations.runbook
+    required_for_tiers: [critical, high, medium]
+    severity: high
+    recommendation: Add a runbook with common alerts, diagnosis steps, and recovery actions.
+    blocking: true
+
+  - id: operations.rollback_plan_required
+    category: operations
+    description: Rollback plan must be documented.
+    field: operations.rollback_plan
+    required_for_tiers: [critical, high]
+    severity: high
+    recommendation: Add rollback steps and validation checks.
+
+  - id: operations.rollback_tested
+    category: operations
+    description: Rollback plan should be tested before production launch.
+    field: operations.rollback_tested
+    expected_value: true
+    required_for_tiers: [critical]
+    severity: low
+    recommendation: Run and document a rollback test before launch.
+
+  - id: operations.deployment_strategy_required
+    category: operations
+    description: Deployment strategy must be defined.
+    field: operations.deployment_strategy
+    required_for_tiers: [critical, high, medium]
+    severity: medium
+    recommendation: Add a deployment strategy such as canary or blue-green.
+
+  - id: operations.known_failure_modes_required
+    category: operations
+    description: Known failure modes should be documented.
+    field: operations.known_failure_modes
+    required_for_tiers: [critical, high, medium]
+    severity: low
+    recommendation: Document likely failures and recovery patterns.
+
+  - id: slo.availability_required
+    category: slo
+    description: Availability target must be defined.
+    field: slo.availability_target
+    required_for_tiers: [critical, high]
+    severity: high
+    recommendation: Define an availability target appropriate for the service tier.
+
+  - id: slo.latency_required
+    category: slo
+    description: Latency target should be defined.
+    field: slo.latency_p95_ms
+    required_for_tiers: [critical, high]
+    severity: medium
+    recommendation: Define a p95 latency target for customer-facing operations.
+
+  - id: slo.error_rate_required
+    category: slo
+    description: Error-rate target should be defined.
+    field: slo.error_rate_percent
+    required_for_tiers: [critical, high]
+    severity: medium
+    recommendation: Define an error-rate target that matches user impact expectations.
+
+  - id: observability.health_endpoint_required
+    category: observability
+    description: Health endpoint must be defined.
+    field: observability.health_endpoint
+    required_for_tiers: [critical, high, medium]
+    severity: high
+    recommendation: Add a health endpoint used by load balancers and operators.
+
+  - id: observability.readiness_endpoint_required
+    category: observability
+    description: Readiness endpoint should be defined.
+    field: observability.readiness_endpoint
+    required_for_tiers: [critical, high, medium]
+    severity: medium
+    recommendation: Add a readiness endpoint for deployment orchestration.
+
+  - id: observability.metrics_required
+    category: observability
+    description: Metrics must be enabled.
+    field: observability.metrics_enabled
+    expected_value: true
+    required_for_tiers: [critical, high, medium]
+    severity: high
+    recommendation: Emit RED or USE metrics for the service.
+
+  - id: observability.tracing_required
+    category: observability
+    description: Tracing should be enabled.
+    field: observability.tracing_enabled
+    expected_value: true
+    required_for_tiers: [critical, high, medium]
+    severity: medium
+    recommendation: Enable distributed tracing for request-level diagnosis.
+
+  - id: observability.logs_structured_required
+    category: observability
+    description: Structured logging should be enabled.
+    field: observability.logs_structured
+    expected_value: true
+    required_for_tiers: [critical, high, medium]
+    severity: medium
+    recommendation: Use structured logs with request and correlation identifiers.
+
+  - id: observability.dashboard_required
+    category: observability
+    description: Dashboard link should be provided.
+    field: observability.dashboard
+    required_for_tiers: [critical, high, medium]
+    severity: medium
+    recommendation: Add a dashboard link for operators and responders.
+
+  - id: alerts.high_error_rate_required
+    category: alerts
+    description: High error-rate alert should exist.
+    field: alerts.high_error_rate
+    expected_value: true
+    required_for_tiers: [critical, high]
+    severity: high
+    recommendation: Add an alert for sustained error-rate spikes.
+
+  - id: alerts.high_latency_required
+    category: alerts
+    description: High latency alert should exist.
+    field: alerts.high_latency
+    expected_value: true
+    required_for_tiers: [critical, high]
+    severity: high
+    recommendation: Add an alert for sustained latency regressions.
+
+  - id: alerts.dependency_failure_required
+    category: alerts
+    description: Dependency failure alert should exist.
+    field: alerts.dependency_failure
+    expected_value: true
+    required_for_tiers: [critical, high]
+    severity: medium
+    recommendation: Add an alert for dependency outages and timeouts.
+
+  - id: alerts.saturation_required
+    category: alerts
+    description: Saturation alert should exist for critical services.
+    field: alerts.saturation
+    expected_value: true
+    required_for_tiers: [critical]
+    severity: medium
+    recommendation: Add saturation alerts for CPU, memory, thread pool, or connection pool pressure.
+    blocking: true
+
+  - id: alerts.routed_to_on_call_required
+    category: alerts
+    description: Alerts should route to the on-call team.
+    field: alerts.routed_to_on_call
+    expected_value: true
+    required_for_tiers: [critical, high, medium]
+    severity: high
+    recommendation: Route alerts to the responsible on-call team.
+
+  - id: dependencies.services_documented
+    category: dependencies
+    description: Service dependencies should be documented.
+    field: dependencies.services
+    required_for_tiers: [critical, high, medium]
+    severity: high
+    recommendation: Document upstream and downstream service dependencies.
+
+  - id: dependencies.databases_documented
+    category: dependencies
+    description: Database dependencies should be documented.
+    field: dependencies.databases
+    required_for_tiers: [critical, high, medium]
+    severity: high
+    recommendation: Document database dependencies and owners.
+
+  - id: dependencies.external_documented
+    category: dependencies
+    description: External dependencies should be documented.
+    field: dependencies.external
+    required_for_tiers: [critical, high, medium]
+    severity: medium
+    recommendation: Document third-party and vendor dependencies.
+
+  - id: dependencies.timeout_strategy_required
+    category: dependencies
+    description: Timeout strategy should be documented.
+    field: dependencies.timeout_strategy
+    required_for_tiers: [critical, high, medium]
+    severity: low
+    recommendation: Define a timeout strategy for downstream calls.
+
+  - id: dependencies.retry_strategy_required
+    category: dependencies
+    description: Retry strategy should be documented.
+    field: dependencies.retry_strategy
+    required_for_tiers: [critical, high, medium]
+    severity: low
+    recommendation: Define a retry strategy and backoff policy.
+
+  - id: security.authentication_required
+    category: security
+    description: Authentication is required for confidential services.
+    field: security.authentication_required
+    expected_value: true
+    required_for_tiers: [critical, high, medium, low]
+    severity: critical
+    recommendation: Require authentication for access to this service.
+    blocking: true
+
+  - id: security.authorization_model_required
+    category: security
+    description: Authorization model should be documented.
+    field: security.authorization_model
+    required_for_tiers: [critical, high, medium]
+    severity: high
+    recommendation: Document the authorization model and access boundaries.
+
+  - id: security.data_classification_required
+    category: security
+    description: Data classification must be defined.
+    field: security.data_classification
+    required_for_tiers: [critical, high, medium, low]
+    severity: high
+    recommendation: Declare the data classification for this service.
+
+  - id: security.secrets_managed_required
+    category: security
+    description: Secrets must be managed outside source code.
+    field: security.secrets_managed
+    expected_value: true
+    required_for_tiers: [critical, high, medium, low]
+    severity: high
+    recommendation: Move secrets into a managed secret store.
+
+  - id: security.retention_policy_required_for_pii
+    category: security
+    description: Services with PII access must define a retention policy.
+    condition:
+      field: security.pii_access
+      equals: true
+    field: security.retention_policy
+    required_for_tiers: [critical, high, medium, low]
+    severity: critical
+    recommendation: Add a data retention and deletion policy for PII.
+    blocking: true
+
+  - id: api.openapi_spec_required
+    category: api
+    description: OpenAPI spec should be provided for HTTP APIs.
+    field: api.openapi_spec
+    required_for_tiers: [critical, high]
+    severity: high
+    recommendation: Add an OpenAPI spec for public or shared HTTP APIs.
+
+  - id: api.versioning_strategy_required
+    category: api
+    description: Versioning strategy should be defined.
+    field: api.versioning_strategy
+    required_for_tiers: [critical, high, medium]
+    severity: medium
+    recommendation: Define the API versioning strategy before production launch.
+
+  - id: api.backward_compatibility_notes_required
+    category: api
+    description: Backward compatibility notes should be provided.
+    field: api.backward_compatibility_notes
+    required_for_tiers: [critical, high]
+    severity: low
+    recommendation: Document compatibility guarantees and migration notes.
+
+  - id: api.deprecation_policy_required
+    category: api
+    description: Public or shared APIs should define a deprecation policy.
+    field: api.deprecation_policy
+    required_for_tiers: [critical, high]
+    severity: medium
+    recommendation: Add a deprecation policy for API changes.
+
