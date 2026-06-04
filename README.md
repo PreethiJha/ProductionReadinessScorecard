@@ -42,3 +42,5 @@ production-readiness-scorecard evaluate \
 - `examples/` sample service and rule inputs
 - `tests/` unit and integration coverage
 - `docs/` usage and scoring notes
+- `CONTRIBUTING.md` project contribution guide
+- `LICENSE` project license text
