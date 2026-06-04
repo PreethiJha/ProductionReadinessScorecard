@@ -1,3 +1,10 @@
+"""YAML loading and validation helpers.
+
+This module keeps file I/O and model validation separate from the business
+logic. That makes it easy to raise user-friendly CLI errors while keeping the
+evaluation engine deterministic and testable.
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -14,6 +21,8 @@ class ScorecardInputError(ValueError):
 
 
 def _load_yaml(path: str | Path) -> dict[str, Any]:
+    """Read a YAML mapping from disk and normalize low-level parse failures."""
+
     file_path = Path(path)
     if not file_path.exists():
         raise ScorecardInputError(f"File not found: {file_path}")
@@ -29,6 +38,8 @@ def _load_yaml(path: str | Path) -> dict[str, Any]:
 
 
 def load_service_metadata(path: str | Path) -> ServiceMetadata:
+    """Load and validate a service metadata document."""
+
     try:
         return ServiceMetadata.model_validate(_load_yaml(path))
     except ValidationError as exc:
@@ -36,8 +47,9 @@ def load_service_metadata(path: str | Path) -> ServiceMetadata:
 
 
 def load_rules_config(path: str | Path) -> RulesConfig:
+    """Load and validate the scorecard rules document."""
+
     try:
         return RulesConfig.model_validate(_load_yaml(path))
     except ValidationError as exc:
         raise ScorecardInputError(str(exc)) from exc
-

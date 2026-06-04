@@ -1,6 +1,11 @@
+"""Score calculation and readiness synthesis.
+
+The scoring layer consumes rule results and turns them into category scores,
+an overall weighted score, launch status, and ordered follow-up suggestions.
+"""
+
 from __future__ import annotations
 
-from collections import defaultdict
 from typing import Iterable
 
 from .models import (
@@ -15,6 +20,8 @@ from .rules import evaluate_rules, rule_points
 
 
 def _rule_weight(result: RuleResult) -> float:
+    """Translate a rule result into earned points."""
+
     if result.status == "pass":
         return float(rule_points(result.severity))
     if result.status == "warn":
@@ -23,6 +30,8 @@ def _rule_weight(result: RuleResult) -> float:
 
 
 def _category_score(results: Iterable[RuleResult], category: str) -> CategoryScore:
+    """Compute one category's normalized score and summary counters."""
+
     category_results = [result for result in results if result.category == category]
     if not category_results:
         return CategoryScore(category=category, score=100, passed=0, failed=0, warnings=0, skipped=0)
@@ -42,6 +51,8 @@ def _category_score(results: Iterable[RuleResult], category: str) -> CategorySco
 
 
 def _overall_status(score: int, blocking_failures: list[str]) -> ReadinessStatus:
+    """Map a numeric score plus blockers to a readiness status."""
+
     if blocking_failures and score >= 80:
         return "Needs Attention"
     if score >= 90:
@@ -54,6 +65,8 @@ def _overall_status(score: int, blocking_failures: list[str]) -> ReadinessStatus
 
 
 def _recommendations(results: list[RuleResult]) -> list[str]:
+    """Return unique remediation suggestions ordered by priority."""
+
     actionable = [result for result in results if result.status in {"fail", "warn"}]
     actionable.sort(
         key=lambda result: (
@@ -80,6 +93,8 @@ def evaluate_scorecard(
     *,
     strict: bool = False,
 ) -> ScorecardResult:
+    """Evaluate a service end to end and return the final scorecard output."""
+
     results = evaluate_rules(service, rules_config, strict=strict)
 
     category_scores = [
@@ -106,4 +121,3 @@ def evaluate_scorecard(
         blocking_failures=blocking_failures,
         recommendations=recommendations,
     )
-

@@ -1,3 +1,10 @@
+"""Report formatting helpers.
+
+The reporter produces human-readable Markdown and machine-readable JSON
+artifacts from a validated scorecard result. Keeping this separate from the
+CLI makes the output easier to test and reuse.
+"""
+
 from __future__ import annotations
 
 import json
@@ -85,10 +92,14 @@ Status: {{ result.status }}
 
 
 def render_markdown_report(result: ScorecardResult) -> str:
+    """Render the Markdown report body for a scorecard result."""
+
     return MARKDOWN_TEMPLATE.render(result=result)
 
 
 def write_markdown_report(result: ScorecardResult, path: str | Path) -> Path:
+    """Write a Markdown report to disk, creating parent folders as needed."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(render_markdown_report(result))
@@ -96,8 +107,9 @@ def write_markdown_report(result: ScorecardResult, path: str | Path) -> Path:
 
 
 def write_json_report(result: ScorecardResult, path: str | Path) -> Path:
+    """Write the JSON report to disk, creating parent folders as needed."""
+
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(result.model_dump(mode="json"), indent=2))
     return output_path
-

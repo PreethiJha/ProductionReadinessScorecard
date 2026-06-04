@@ -1,3 +1,10 @@
+"""Rule evaluation helpers.
+
+This module turns raw service metadata and rule definitions into rule-level
+results. It deliberately avoids scoring and reporting concerns so the logic
+stays easy to unit test.
+"""
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -7,6 +14,8 @@ from .models import RuleConfig, RuleResult, RuleStatus, ServiceMetadata, Severit
 
 
 def get_nested_value(data: Any, path: str) -> Any:
+    """Resolve a dotted field path from a mapping or object tree."""
+
     current = data
     for part in path.split("."):
         if isinstance(current, Mapping):
@@ -19,6 +28,8 @@ def get_nested_value(data: Any, path: str) -> Any:
 
 
 def is_present(value: Any) -> bool:
+    """Return ``True`` when a value should count as configured."""
+
     if value is None:
         return False
     if value == "":
@@ -29,19 +40,27 @@ def is_present(value: Any) -> bool:
 
 
 def evaluate_condition(service: ServiceMetadata, condition_field: str, expected: Any) -> bool:
+    """Check whether a rule condition matches the current service."""
+
     actual = get_service_value(service, condition_field)
     return actual == expected
 
 
 def get_service_value(service: ServiceMetadata, field_path: str) -> Any:
+    """Read a dotted field path from a validated service model."""
+
     return get_nested_value(service.model_dump(), field_path)
 
 
 def rule_points(severity: Severity) -> int:
+    """Return the score weight associated with a severity level."""
+
     return {"critical": 10, "high": 7, "medium": 4, "low": 2}[severity]
 
 
 def is_blocking_failure(service: ServiceMetadata, rule: RuleConfig, actual: Any) -> bool:
+    """Determine whether a failed rule must cap readiness."""
+
     if rule.blocking:
         return True
 
@@ -64,6 +83,8 @@ def is_blocking_failure(service: ServiceMetadata, rule: RuleConfig, actual: Any)
 
 
 def evaluate_rule(service: ServiceMetadata, rule: RuleConfig, *, strict: bool = False) -> RuleResult:
+    """Evaluate a single rule against a service."""
+
     if service.service.tier not in rule.required_for_tiers:
         return RuleResult(
             rule_id=rule.id,
@@ -143,5 +164,6 @@ def evaluate_rules(
     *,
     strict: bool = False,
 ) -> list[RuleResult]:
-    return [evaluate_rule(service, rule, strict=strict) for rule in rules]
+    """Evaluate every configured rule in order."""
 
+    return [evaluate_rule(service, rule, strict=strict) for rule in rules]

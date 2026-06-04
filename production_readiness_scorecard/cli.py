@@ -1,3 +1,9 @@
+"""Typer-based CLI for the production readiness scorecard.
+
+The CLI keeps orchestration concerns here and delegates parsing, evaluation,
+scoring, and report generation to the domain modules.
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -17,6 +23,8 @@ console = Console()
 
 
 def _print_summary(result: ScorecardResult) -> None:
+    """Print a compact terminal summary of the final scorecard result."""
+
     console.print("[bold]Production Readiness Scorecard[/bold]")
     console.print()
     console.print(f"Service: {result.service_name}")
@@ -76,6 +84,13 @@ def evaluate(
     include_recommendations: bool = typer.Option(True, "--include-recommendations/--no-include-recommendations", help="Show recommendations in the terminal output."),
     verbose: bool = typer.Option(False, "--verbose", help="Print detailed rule-by-rule output."),
 ) -> None:
+    """Run the readiness evaluation command.
+
+    The command intentionally exits with a CI-friendly status code instead of
+    returning a value. That keeps shell usage and GitHub Actions integration
+    straightforward.
+    """
+
     try:
         service_metadata = load_service_metadata(service)
         rules_config = load_rules_config(rules)
@@ -100,6 +115,7 @@ def evaluate(
             console.print()
             console.print("[bold]Rule Details[/bold]")
             for rule in result.rule_results:
+                # Keep verbose output dense so it remains readable in CI logs.
                 console.print(
                     f"{rule.rule_id}: {rule.status} "
                     f"(severity={rule.severity}, impact={rule.score_impact}, blocking={rule.blocking})"
@@ -120,6 +136,8 @@ def evaluate(
 
 
 def main() -> None:
+    """Entry point used by the console script and ``python -m``."""
+
     app()
 
 

@@ -29,6 +29,8 @@ SEVERITY_POINTS: dict[str, int] = {
 
 
 class ServiceInfo(BaseModel):
+    """Top-level service identity and ownership metadata."""
+
     model_config = ConfigDict(extra="ignore")
 
     name: str
@@ -40,6 +42,8 @@ class ServiceInfo(BaseModel):
 
 
 class OwnershipMetadata(BaseModel):
+    """Human ownership and escalation metadata for a service."""
+
     model_config = ConfigDict(extra="ignore")
 
     slack_channel: str | None = None
@@ -49,6 +53,8 @@ class OwnershipMetadata(BaseModel):
 
 
 class OperationsMetadata(BaseModel):
+    """Operational recovery and deployment metadata."""
+
     model_config = ConfigDict(extra="ignore")
 
     runbook: str | None = None
@@ -60,6 +66,8 @@ class OperationsMetadata(BaseModel):
 
 
 class SloMetadata(BaseModel):
+    """Service-level objective targets used to assess reliability posture."""
+
     model_config = ConfigDict(extra="ignore")
 
     availability_target: float | None = None
@@ -68,6 +76,8 @@ class SloMetadata(BaseModel):
 
 
 class ObservabilityMetadata(BaseModel):
+    """Telemetry and operator visibility signals."""
+
     model_config = ConfigDict(extra="ignore")
 
     health_endpoint: str | None = None
@@ -79,6 +89,8 @@ class ObservabilityMetadata(BaseModel):
 
 
 class AlertsMetadata(BaseModel):
+    """Alerting posture for the service."""
+
     model_config = ConfigDict(extra="ignore")
 
     high_error_rate: bool | None = None
@@ -89,6 +101,8 @@ class AlertsMetadata(BaseModel):
 
 
 class DependenciesMetadata(BaseModel):
+    """Downstream and upstream dependency references."""
+
     model_config = ConfigDict(extra="ignore")
 
     services: list[str] = Field(default_factory=list)
@@ -99,6 +113,8 @@ class DependenciesMetadata(BaseModel):
 
 
 class SecurityMetadata(BaseModel):
+    """Security and data-handling posture."""
+
     model_config = ConfigDict(extra="ignore")
 
     authentication_required: bool | None = None
@@ -110,6 +126,8 @@ class SecurityMetadata(BaseModel):
 
 
 class ApiMetadata(BaseModel):
+    """API compatibility and lifecycle metadata."""
+
     model_config = ConfigDict(extra="ignore")
 
     openapi_spec: str | None = None
@@ -119,6 +137,8 @@ class ApiMetadata(BaseModel):
 
 
 class ServiceMetadata(BaseModel):
+    """Validated service metadata loaded from ``service.yaml``."""
+
     model_config = ConfigDict(extra="ignore")
 
     service: ServiceInfo
@@ -133,6 +153,8 @@ class ServiceMetadata(BaseModel):
 
 
 class RuleCondition(BaseModel):
+    """Optional predicate that gates whether a rule applies."""
+
     model_config = ConfigDict(extra="ignore")
 
     field: str
@@ -140,12 +162,16 @@ class RuleCondition(BaseModel):
 
 
 class CategoryWeight(BaseModel):
+    """Configured weight for a scorecard category."""
+
     model_config = ConfigDict(extra="ignore")
 
     weight: int
 
 
 class RuleConfig(BaseModel):
+    """A single production-readiness rule definition."""
+
     model_config = ConfigDict(extra="ignore")
 
     id: str
@@ -168,6 +194,8 @@ class RuleConfig(BaseModel):
 
 
 class ScorecardConfig(BaseModel):
+    """Top-level scorecard settings and category weighting."""
+
     model_config = ConfigDict(extra="ignore")
 
     passing_score: int = 80
@@ -189,6 +217,8 @@ class ScorecardConfig(BaseModel):
 
 
 class RulesConfig(BaseModel):
+    """Validated rule document loaded from ``rules.yaml``."""
+
     model_config = ConfigDict(extra="ignore")
 
     scorecard: ScorecardConfig
@@ -202,6 +232,8 @@ class RulesConfig(BaseModel):
 
 
 class RuleResult(BaseModel):
+    """Result of evaluating one rule against one service."""
+
     model_config = ConfigDict(extra="ignore")
 
     rule_id: str
@@ -217,6 +249,8 @@ class RuleResult(BaseModel):
 
 
 class CategoryScore(BaseModel):
+    """Score and counters for one readiness category."""
+
     model_config = ConfigDict(extra="ignore")
 
     category: str
@@ -228,6 +262,8 @@ class CategoryScore(BaseModel):
 
 
 class ScorecardResult(BaseModel):
+    """Full evaluation output returned by the scoring engine."""
+
     model_config = ConfigDict(extra="ignore")
 
     service_name: str
